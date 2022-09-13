@@ -57,7 +57,17 @@ class SongsHandler {
     }
   }
 
-  async getSongsHandler() {
+  async getSongsHandler(request, h) {
+    const { title, performer } = request.query;
+    if (title || performer) {
+      const songs = await this._service.getSongs(title, performer);
+      return {
+        status: "success",
+        data: {
+          songs,
+        },
+      };
+    }
     const songs = await this._service.getSongs();
     return {
       status: "success",

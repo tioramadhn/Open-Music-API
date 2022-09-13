@@ -10,7 +10,6 @@ class SongsService {
   }
 
   async addSong({ title, year, performer, genre, duration, albumId }) {
-    // make id as priamary key
     const id = `song-${nanoid(16)}`;
 
     const query = {
@@ -27,7 +26,13 @@ class SongsService {
     return result.rows[0].id;
   }
 
-  async getSongs() {
+  async getSongs(title = "%", performer = "%") {
+    if (title || performer) {
+      const result = await this._pool.query(
+        `SELECT id, title, performer FROM songs WHERE LOWER(title) LIKE LOWER('${title}%') AND LOWER(performer) LIKE LOWER('${performer}%')`
+      );
+      return result.rows.map(mapSongsDBToModel);
+    }
     const result = await this._pool.query(
       "SELECT id, title, performer FROM songs"
     );
